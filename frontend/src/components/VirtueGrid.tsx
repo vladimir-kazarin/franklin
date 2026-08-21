@@ -17,6 +17,7 @@ export function VirtueGrid() {
 
   const dates = useMemo(() => weekDates(weekStart), [weekStart]);
   const weekEnd = dates[6];
+  const focusVirtue = virtues.find((v) => v.id === focus?.virtueId);
 
   useEffect(() => {
     fetchVirtues().then(setVirtues).catch((e) => setError(String(e)));
@@ -103,6 +104,17 @@ export function VirtueGrid() {
           ))
         )}
       </div>
+
+      {focusVirtue && (
+        <div className="focus-summary">
+          <p>
+            This week's focus: <strong>{focusVirtue.name}</strong> — {focusVirtue.precept}
+          </p>
+          <p className="focus-rationale">
+            &ldquo;{focusVirtue.rationale}&rdquo; — Ben Franklin
+          </p>
+        </div>
+      )}
     </div>
   );
 }

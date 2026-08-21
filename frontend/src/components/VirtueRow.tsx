@@ -18,7 +18,7 @@ export function VirtueRow({ virtue, dates, faultsByDate, isFocus, today, onToggl
   return (
     <div className={`virtue-row${isFocus ? " focus" : ""}`}>
       <div className="virtue-info" onClick={() => setExpanded((e) => !e)}>
-        <div className="virtue-name">
+        <div className="virtue-name" title={virtue.precept}>
           {isFocus && <span className="focus-badge">Focus</span>}
           {virtue.name}
         </div>
