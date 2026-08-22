@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { VirtueGrid } from "./components/VirtueGrid";
 import { AboutModal } from "./components/AboutModal";
+import { CreditsModal } from "./components/CreditsModal";
 
 function App() {
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [creditsOpen, setCreditsOpen] = useState(false);
 
   return (
     <div className="app">
@@ -13,9 +15,14 @@ function App() {
       </header>
       <VirtueGrid />
       {aboutOpen && <AboutModal onClose={() => setAboutOpen(false)} />}
+      {creditsOpen && <CreditsModal onClose={() => setCreditsOpen(false)} />}
       <footer className="app-footer">
         <button className="about-link" onClick={() => setAboutOpen(true)}>
           About
+        </button>{" "}
+        |{" "}
+        <button className="about-link" onClick={() => setCreditsOpen(true)}>
+          Credits
         </button>{" "}
         | Developed by{" "}
         <a href="https://vladcodes.com" target="_blank" rel="noopener noreferrer">

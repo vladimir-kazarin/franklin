@@ -1,6 +1,15 @@
-import type { Entry, FocusResponse, Virtue } from "./types";
+import type { Entry, FocusResponse, ReflectionRequest, Virtue } from "./types";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "";
+
+export class ApiError extends Error {
+  code?: string;
+
+  constructor(message: string, code?: string) {
+    super(message);
+    this.code = code;
+  }
+}
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -8,7 +17,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
   });
   if (!res.ok) {
-    throw new Error(`${init?.method ?? "GET"} ${path} failed: ${res.status}`);
+    const data = await res.json().catch(() => null);
+    throw new ApiError(
+      data?.error ?? `${init?.method ?? "GET"} ${path} failed: ${res.status}`,
+      data?.code
+    );
   }
   return res.json() as Promise<T>;
 }
@@ -29,5 +42,12 @@ export function setEntry(date: string, virtueId: number, faulted: boolean): Prom
   return request<Entry>("/api/entries", {
     method: "PUT",
     body: JSON.stringify({ date, virtueId, faulted }),
+  });
+}
+
+export function fetchReflection(body: ReflectionRequest): Promise<{ reflection: string }> {
+  return request<{ reflection: string }>("/api/reflect", {
+    method: "POST",
+    body: JSON.stringify(body),
   });
 }

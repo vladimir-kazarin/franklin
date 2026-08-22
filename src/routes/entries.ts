@@ -13,8 +13,10 @@ entriesRouter.get("/", (req, res) => {
   }
 
   const rows = db
-    .prepare("SELECT date, virtue_id as virtueId, faulted FROM entries WHERE date >= ? AND date <= ?")
-    .all(start, end) as { date: string; virtueId: number; faulted: number }[];
+    .prepare(
+      "SELECT date, virtue_id as virtueId, faulted FROM entries WHERE date >= ? AND date <= ? AND user_id = ?"
+    )
+    .all(start, end, req.userId) as { date: string; virtueId: number; faulted: number }[];
 
   res.json(rows.map((r) => ({ ...r, faulted: !!r.faulted })));
 });
@@ -36,9 +38,9 @@ entriesRouter.put("/", (req, res) => {
   }
 
   db.prepare(
-    `INSERT INTO entries (date, virtue_id, faulted) VALUES (?, ?, ?)
-     ON CONFLICT(date, virtue_id) DO UPDATE SET faulted = excluded.faulted`
-  ).run(date, virtueId, faulted ? 1 : 0);
+    `INSERT INTO entries (date, virtue_id, user_id, faulted) VALUES (?, ?, ?, ?)
+     ON CONFLICT(date, virtue_id, user_id) DO UPDATE SET faulted = excluded.faulted`
+  ).run(date, virtueId, req.userId, faulted ? 1 : 0);
 
   res.json({ date, virtueId, faulted });
 });

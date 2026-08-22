@@ -11,6 +11,18 @@ if (!existsSync(dataDir)) mkdirSync(dataDir, { recursive: true });
 export const db = new Database(path.join(dataDir, "franklin.db"));
 db.pragma("journal_mode = WAL");
 
+function dropIfNotPerUser(table: string) {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
+  if (columns.length > 0 && !columns.some((c) => c.name === "user_id")) {
+    db.exec(`DROP TABLE ${table}`);
+  }
+}
+
+// entries/settings predate per-user scoping; drop and recreate rather than
+// migrate, since that old data was never meaningfully multi-user anyway.
+dropIfNotPerUser("entries");
+dropIfNotPerUser("settings");
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS virtues (
     id INTEGER PRIMARY KEY,
@@ -23,13 +35,16 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS entries (
     date TEXT NOT NULL,
     virtue_id INTEGER NOT NULL REFERENCES virtues(id),
+    user_id TEXT NOT NULL,
     faulted INTEGER NOT NULL DEFAULT 1,
-    UNIQUE(date, virtue_id)
+    UNIQUE(date, virtue_id, user_id)
   );
 
   CREATE TABLE IF NOT EXISTS settings (
-    key TEXT PRIMARY KEY,
-    value TEXT NOT NULL
+    user_id TEXT NOT NULL,
+    key TEXT NOT NULL,
+    value TEXT NOT NULL,
+    PRIMARY KEY (user_id, key)
   );
 `);
 
@@ -60,9 +75,14 @@ function seedVirtues() {
   backfill();
 }
 
-function seedCycleStart() {
-  const existing = db.prepare("SELECT value FROM settings WHERE key = 'cycle_start_date'").get();
-  if (existing) return;
+migrateVirtues();
+seedVirtues();
+
+export function getCycleStart(userId: string): string {
+  const row = db
+    .prepare("SELECT value FROM settings WHERE user_id = ? AND key = 'cycle_start_date'")
+    .get(userId) as { value: string } | undefined;
+  if (row) return row.value;
 
   const now = new Date();
   const day = now.getUTCDay();
@@ -71,16 +91,9 @@ function seedCycleStart() {
   monday.setUTCDate(now.getUTCDate() - diffToMonday);
   const cycleStart = monday.toISOString().slice(0, 10);
 
-  db.prepare("INSERT INTO settings (key, value) VALUES ('cycle_start_date', ?)").run(cycleStart);
-}
-
-migrateVirtues();
-seedVirtues();
-seedCycleStart();
-
-export function getCycleStart(): string {
-  const row = db.prepare("SELECT value FROM settings WHERE key = 'cycle_start_date'").get() as {
-    value: string;
-  };
-  return row.value;
+  db.prepare("INSERT INTO settings (user_id, key, value) VALUES (?, 'cycle_start_date', ?)").run(
+    userId,
+    cycleStart
+  );
+  return cycleStart;
 }

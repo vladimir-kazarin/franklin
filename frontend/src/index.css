@@ -111,6 +111,17 @@ body {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
+.reflect-modal-icon {
+  width: 72px;
+  height: 72px;
+}
+
+.loading-dots {
+  display: inline-block;
+  width: 18px;
+  text-align: left;
+}
+
 .about-text h2 {
   font-size: 16px;
   color: var(--text-h);
@@ -182,6 +193,63 @@ body {
   justify-content: center;
 }
 
+.reflect-button {
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.reflect-button:hover {
+  background: var(--accent-bg);
+}
+
+.reflect-button img {
+  width: 36px;
+  height: 36px;
+  display: block;
+}
+
+.reflect-hint {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  animation: reflect-hint-bounce 1.4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.reflect-hint::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--accent);
+}
+
+@keyframes reflect-hint-bounce {
+  0%,
+  100% {
+    transform: translate(-50%, -100%);
+  }
+  50% {
+    transform: translate(-50%, calc(-100% - 4px));
+  }
+}
+
 .today-link {
   font-weight: 400;
   font-size: 12px;
@@ -204,7 +272,7 @@ body {
 }
 
 .focus-summary {
-  margin: 12px 0 0;
+  margin: 0 0 16px;
   text-align: center;
 }
 
@@ -248,6 +316,7 @@ body {
 .virtue-info {
   padding: 10px 14px;
   cursor: pointer;
+  min-width: 0;
 }
 
 .virtue-name {
@@ -339,4 +408,35 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .app {
+    padding: 20px 8px 48px;
+  }
+
+  .virtue-row {
+    grid-template-columns: minmax(84px, 110px) repeat(7, minmax(0, 1fr)) 24px;
+  }
+
+  .virtue-info {
+    padding: 8px 6px;
+  }
+
+  .virtue-name {
+    font-size: 11px;
+    gap: 3px;
+    flex-wrap: wrap;
+    line-height: 125%;
+  }
+
+  .focus-badge {
+    font-size: 0;
+    padding: 4px;
+    border-radius: 50%;
+  }
+
+  .virtue-count {
+    font-size: 11px;
+  }
 }

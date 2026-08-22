@@ -17,3 +17,10 @@ export interface FocusResponse {
   weekStart: string;
   weekEnd: string;
 }
+
+export interface ReflectionRequest {
+  weekStart: string;
+  weekEnd: string;
+  focusVirtueName: string;
+  faults: { virtueName: string; date: string }[];
+}
