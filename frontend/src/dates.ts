@@ -4,6 +4,15 @@ export function toISODate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
+// Unlike toISODate (which is UTC-based and used for the UTC-anchored dates
+// throughout this file), this reflects the viewer's actual local calendar day.
+export function localISODate(d: Date = new Date()): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function mondayOf(dateStr: string): string {
   const date = new Date(`${dateStr}T00:00:00Z`);
   const diffToMonday = (date.getUTCDay() + 6) % 7;

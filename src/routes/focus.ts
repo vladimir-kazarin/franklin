@@ -13,7 +13,7 @@ focusRouter.get("/", (req, res) => {
     return;
   }
 
-  const cycleStart = getCycleStart();
+  const cycleStart = getCycleStart(req.userId);
   const weekStart = weekStartFor(date);
   const weekEnd = weekEndFor(weekStart);
   const virtueId = computeFocusVirtueId(date, cycleStart);

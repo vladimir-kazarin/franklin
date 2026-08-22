@@ -12,13 +12,11 @@
   "dependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.1086.0",
     "better-sqlite3": "^11.9.1",
-    "cors": "^2.8.5",
     "dotenv": "^17.4.2",
     "express": "^4.21.2"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
-    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^22.10.5",
     "tsx": "^4.19.2",
